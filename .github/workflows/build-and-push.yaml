@@ -26,3 +26,6 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/telegram-youtube-video-uploader:latest
           platforms: linux/amd64,linux/arm64,linux/arm/v7
+          # Cache the image layers
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

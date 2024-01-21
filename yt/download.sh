@@ -13,4 +13,4 @@ while ! nc -z localhost 3000; do
 done
 
 # Send a CURL request to the bot with the video
-curl --location "http://localhost:3000/bot${BOT_TOKEN}/sendVideo?chat_id=975596313" --form "video=@\"${VID_TITLE}.mp4\"" || exit 1
+curl --location "http://localhost:3000/bot${BOT_TOKEN}/sendVideo?chat_id=${CHAT_ID}" --form "video=@\"${VID_TITLE}.mp4\"" || exit 1
