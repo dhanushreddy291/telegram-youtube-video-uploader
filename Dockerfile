@@ -19,6 +19,8 @@ RUN rm -rf build && \
 # Stage 2: Final Image
 FROM python:3.10.13-alpine
 
+LABEL maintainer="dhanushreddy291@yahoo.com"
+
 # Copy only the necessary files from the build stage
 COPY --from=builder /usr/local/bin/telegram-bot-api* /usr/local/bin/
 
