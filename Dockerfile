@@ -24,11 +24,29 @@ LABEL maintainer="dhanushreddy291@yahoo.com"
 # Copy only the necessary files from the build stage
 COPY --from=builder /usr/local/bin/telegram-bot-api* /usr/local/bin/
 
-RUN apk update && apk upgrade && apk --no-cache add curl ffmpeg
-# Copy files from yt directory to the root directory of the Docker image
+# Make it executable
+RUN chmod +x /usr/local/bin/telegram-bot-api
+
+RUN apk update && apk upgrade && apk add curl ffmpeg
+
+# Upgrade pip and install required Python packages
+RUN pip install --upgrade pip && \
+    pip install requests
+
 COPY yt/ yt/
+COPY poll.py /usr/home/poll.py
+COPY start.sh /start.sh
 
-# Entry point is download.sh script
-ENTRYPOINT ["/bin/sh", "/yt/download.sh"]
-CMD []
+# Make scripts and bot API executable
+RUN chmod +x /usr/local/bin/telegram-bot-api && \
+    chmod +x yt/audio.sh && \
+    chmod +x yt/video.sh && \
+    chmod +x /usr/home/poll.py && \
+    chmod +x /start.sh && \
+    echo '* * * * * /usr/local/bin/python /usr/home/poll.py > /var/log/cron.log 2>&1' > /etc/crontabs/root
 
+# Expose the necessary port
+EXPOSE 8080
+
+# Set the entry point to the start script
+CMD ["/start.sh"]
