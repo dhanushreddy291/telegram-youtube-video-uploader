@@ -31,9 +31,18 @@ done
 
 # Send a CURL request to the bot with the video
 if [ "$IS_AUDIO_ONLY" = "true" ]; then
-    CURL_COMMAND_TO_EXECUTE="curl --location 'http://localhost:3000/bot${BOT_TOKEN}/sendAudio?chat_id=${CHAT_ID}' --form 'audio=@\"${VID_TITLE}.mp3\"'"
+    # Escape single quotes within the video title
+    VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE" | sed "s/'/\\\\'/g")
+    # Escape double quotes within the video title
+    VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE_ESCAPED" | sed 's/"/\\"/g')
+    CURL_COMMAND_TO_EXECUTE="curl --location \"http://localhost:3000/bot${BOT_TOKEN}/sendAudio?chat_id=${CHAT_ID}\" --form \"audio=@\\\"${VID_TITLE_ESCAPED}.mp3\\\"\""
 else
-    CURL_COMMAND_TO_EXECUTE="curl --location 'http://localhost:3000/bot${BOT_TOKEN}/sendVideo?chat_id=${CHAT_ID}' --form 'video=@\"${VID_TITLE}.mp4\"'"
+    # Escape single quotes within the video title
+    VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE" | sed "s/'/\\\\'/g")
+    # Escape double quotes within the video title
+    VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE_ESCAPED" | sed 's/"/\\"/g')
+    CURL_COMMAND_TO_EXECUTE="curl --location \"http://localhost:3000/bot${BOT_TOKEN}/sendVideo?chat_id=${CHAT_ID}\" --form \"video=@\\\"${VID_TITLE_ESCAPED}.mp4\\\"\""
 fi
 
 eval "$CURL_COMMAND_TO_EXECUTE" || exit 1
+
