@@ -1,8 +1,9 @@
 #!/bin/sh
 export PYTHONPATH="${PYTHONPATH}:/yt/"
 VID_URL="$1"
-VID_TITLE=$(python -m youtube_dl --get-title "$VID_URL" | sed 's/[\[\]!@#\$%^&*()_+|~=`{}\\:;"'\''<>?,.\/]/_/g')
-VID_TITLE=$(python -m youtube_dl --get-title "$VID_URL" | sed 's/[/\:*?"<>|]/_/g')
+VID_TITLE=$(python -m youtube_dl --get-title "$VID_URL")
+
+# Properly quote variables in COMMAND_TO_EXECUTE
 COMMAND_TO_EXECUTE="python -m youtube_dl -f 'bestvideo[height<=1080]+bestaudio/best[height<=1080]' -o '${VID_TITLE}.mp4' --merge-output-format mp4 '$VID_URL'"
 
 # Check the environment variable if IS_AUDIO_ONLY is set then download the audio only
