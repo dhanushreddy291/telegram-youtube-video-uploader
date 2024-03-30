@@ -22,10 +22,10 @@ eval "$COMMAND_TO_EXECUTE" || exit 1
 
 
 # Start the bot server in the background
-/usr/local/bin/telegram-bot-api --local --http-port 3000 --api-id "$API_ID" --api-hash "$API_HASH" &
+/usr/local/bin/telegram-bot-api --local --http-port 3002 --api-id "$API_ID" --api-hash "$API_HASH" &
 
 # Wait for the server to start
-while ! nc -z localhost 3000; do   
+while ! nc -z localhost 3002; do   
     sleep 0.1 # wait for 1/10 of the second before check again
 done
 
@@ -35,13 +35,13 @@ if [ "$IS_AUDIO_ONLY" = "true" ]; then
     VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE" | sed "s/'/\\\\'/g")
     # Escape double quotes within the video title
     VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE_ESCAPED" | sed 's/"/\\"/g')
-    CURL_COMMAND_TO_EXECUTE="curl --location \"http://localhost:3000/bot${BOT_TOKEN}/sendAudio?chat_id=${CHAT_ID}\" --form \"audio=@\\\"${VID_TITLE_ESCAPED}.mp3\\\"\""
+    CURL_COMMAND_TO_EXECUTE="curl --location \"http://localhost:3002/bot${BOT_TOKEN}/sendAudio?chat_id=${CHAT_ID}\" --form \"audio=@\\\"${VID_TITLE_ESCAPED}.mp3\\\"\""
 else
     # Escape single quotes within the video title
     VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE" | sed "s/'/\\\\'/g")
     # Escape double quotes within the video title
     VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE_ESCAPED" | sed 's/"/\\"/g')
-    CURL_COMMAND_TO_EXECUTE="curl --location \"http://localhost:3000/bot${BOT_TOKEN}/sendVideo?chat_id=${CHAT_ID}\" --form \"video=@\\\"${VID_TITLE_ESCAPED}.mp4\\\"\""
+    CURL_COMMAND_TO_EXECUTE="curl --location \"http://localhost:3002/bot${BOT_TOKEN}/sendVideo?chat_id=${CHAT_ID}\" --form \"video=@\\\"${VID_TITLE_ESCAPED}.mp4\\\"\""
 fi
 
 eval "$CURL_COMMAND_TO_EXECUTE" || exit 1
