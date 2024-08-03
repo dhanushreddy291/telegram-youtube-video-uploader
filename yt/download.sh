@@ -1,7 +1,7 @@
 #!/bin/sh
 export PYTHONPATH="${PYTHONPATH}:/yt/"
 VID_URL="$1"
-VID_TITLE=$(python -m youtube_dl --get-title "$VID_URL")
+VID_TITLE=$(yt-dlp --get-title "$VID_URL")
 
 # Escape single quotes within the video title
 VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE" | sed "s/'/\\\\'/g")
@@ -9,11 +9,11 @@ VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE" | sed "s/'/\\\\'/g")
 VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE_ESCAPED" | sed 's/"/\\"/g')
 
 # Properly quote variables in COMMAND_TO_EXECUTE
-COMMAND_TO_EXECUTE="python -m youtube_dl -f 'bestvideo[height<=1080]+bestaudio/best[height<=1080]' -o \"${VID_TITLE_ESCAPED}.mp4\" --merge-output-format mp4 \"$VID_URL\""
+COMMAND_TO_EXECUTE="yt-dlp -f 'bestvideo[height<=1080]+bestaudio/best[height<=1080]' -o \"${VID_TITLE_ESCAPED}.mp4\" --merge-output-format mp4 \"$VID_URL\""
 
 # Check the environment variable if IS_AUDIO_ONLY is set then download the audio only
 if [ "$IS_AUDIO_ONLY" = "true" ]; then
-    COMMAND_TO_EXECUTE="python -m youtube_dl -x --audio-format mp3 -f 'bestaudio/best' -o \"${VID_TITLE_ESCAPED}.mp3\" \"$VID_URL\""
+    COMMAND_TO_EXECUTE="yt-dlp -x --audio-format mp3 -f 'bestaudio/best' -o \"${VID_TITLE_ESCAPED}.mp3\" \"$VID_URL\""
 fi
 
 # Execute the command

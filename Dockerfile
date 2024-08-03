@@ -10,6 +10,7 @@ LABEL maintainer="dhanushreddy291@yahoo.com"
 COPY --from=base /usr/local/bin/telegram-bot-api* /usr/local/bin/
 
 RUN apk update && apk upgrade && apk --no-cache add curl ffmpeg
+RUN pip install --upgrade pip "yt-dlp[default]"
 
 # Copy files from yt directory to the root directory of the Docker image
 COPY yt/ yt/
