@@ -3,6 +3,9 @@ export PYTHONPATH="${PYTHONPATH}:/yt/"
 VID_URL="$1"
 VID_TITLE=$(yt-dlp --get-title "$VID_URL")
 
+# Trimming the video title to first 100 characters
+VID_TITLE=$(echo "$VID_TITLE" | cut -c 1-100)
+
 # Escape single quotes within the video title
 VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE" | sed "s/'/\\\\'/g")
 # Escape double quotes within the video title
