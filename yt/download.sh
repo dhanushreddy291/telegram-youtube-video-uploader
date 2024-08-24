@@ -22,38 +22,44 @@ fi
 # Execute the command
 eval "$COMMAND_TO_EXECUTE" || exit 1
 
+# Escape single quotes within the video title
+VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE" | sed "s/'/\\\\'/g")
+# Escape double quotes within the video title
+VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE_ESCAPED" | sed 's/"/\\"/g')
 
-echo "Starting the bot server"
+if [ "$SEND_TO_TELEGRAM" = "true" ]; then
+    echo "Starting the bot server"
 
-# Start the bot server in the background
-/usr/local/bin/telegram-bot-api --local --http-port 3002 --api-id "$API_ID" --api-hash "$API_HASH" &
+    # Start the bot server in the background
+    /usr/local/bin/telegram-bot-api --local --http-port 3002 --api-id "$API_ID" --api-hash "$API_HASH" &
 
-echo "Bot server started"
+    echo "Bot server started"
 
-# Wait for the server to start
-while ! curl -s http://localhost:3002 > /dev/null; do
-    sleep 0.1 # wait for 1/10 of the second before check again
-    echo "Waiting for the bot server to start..."
-done
+    # Wait for the server to start
+    while ! curl -s http://localhost:3002 > /dev/null; do
+        sleep 0.1 # wait for 1/10 of the second before check again
+        echo "Waiting for the bot server to start..."
+    done
 
-
-# Send a CURL request to the bot with the video
-if [ "$IS_AUDIO_ONLY" = "true" ]; then
-    # Escape single quotes within the video title
-    VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE" | sed "s/'/\\\\'/g")
-    # Escape double quotes within the video title
-    VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE_ESCAPED" | sed 's/"/\\"/g')
-    echo "Sending audio to the bot"
-    CURL_COMMAND_TO_EXECUTE="curl --location \"http://localhost:3002/bot${BOT_TOKEN}/sendAudio?chat_id=${CHAT_ID}\" --form \"audio=@\\\"${VID_TITLE_ESCAPED}.mp3\\\"\""
-else
-    # Escape single quotes within the video title
-    VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE" | sed "s/'/\\\\'/g")
-    # Escape double quotes within the video title
-    VID_TITLE_ESCAPED=$(printf "%s" "$VID_TITLE_ESCAPED" | sed 's/"/\\"/g')
-    echo "Sending video to the bot"
-    CURL_COMMAND_TO_EXECUTE="curl --location \"http://localhost:3002/bot${BOT_TOKEN}/sendVideo?chat_id=${CHAT_ID}\" --form \"video=@\\\"${VID_TITLE_ESCAPED}.mp4\\\"\""
+    # Send a CURL request to the bot with the video
+    if [ "$IS_AUDIO_ONLY" = "true" ]; then
+        echo "Sending audio to the bot"
+        CURL_COMMAND_TO_EXECUTE="curl --location \"http://localhost:3002/bot${BOT_TOKEN}/sendAudio?chat_id=${CHAT_ID}\" --form \"audio=@\\\"${VID_TITLE_ESCAPED}.mp3\\\"\""
+    else
+        echo "Sending video to the bot"
+        CURL_COMMAND_TO_EXECUTE="curl --location \"http://localhost:3002/bot${BOT_TOKEN}/sendVideo?chat_id=${CHAT_ID}\" --form \"video=@\\\"${VID_TITLE_ESCAPED}.mp4\\\"\""
+    fi
 fi
-
 eval "$CURL_COMMAND_TO_EXECUTE" || exit 1
+
+# Upload to Cloudflare R2 always
+echo "Uploading to Cloudflare R2"
+
+# Call the function to upload the video to Cloudflare R2
+if [ "$IS_AUDIO_ONLY" = "true" ]; then
+    python /yt/upload-to-r2.py "${VID_TITLE_ESCAPED}.mp3" || exit 1
+else
+    python /yt/upload-to-r2.py "${VID_TITLE_ESCAPED}.mp4" || exit 1
+fi
 
 echo "Task completed successfully"

@@ -5,6 +5,7 @@ on:
     branches:
       - "feature/audio-support"
       - "main"
+      - "feature/upload-to-r2"
 
 jobs:
   build:
@@ -25,7 +26,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/telegram-youtube-video-uploader:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/telegram-youtube-video-uploader:upload-to-r2
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           # Cache the image layers
           cache-from: type=gha

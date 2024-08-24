@@ -1,5 +1,5 @@
 # Stage 1: Build Stage
-FROM dhanushreddy29/telegram-youtube-video-uploader:latest as base
+FROM dhanushreddy29/telegram-youtube-video-uploader:latest AS base
 
 # Stage 2: Final Image
 FROM python:3.10.13-alpine
@@ -10,7 +10,14 @@ LABEL maintainer="dhanushreddy291@yahoo.com"
 COPY --from=base /usr/local/bin/telegram-bot-api* /usr/local/bin/
 
 RUN apk update && apk upgrade && apk --no-cache add curl ffmpeg build-base
-RUN pip install --upgrade pip "yt-dlp[default]"
+RUN pip install --upgrade pip
+
+# Copy the requirements.txt file to the Docker image
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# Delete the requirements.txt file
+RUN rm requirements.txt
 
 # Copy files from yt directory to the root directory of the Docker image
 COPY yt/ yt/
